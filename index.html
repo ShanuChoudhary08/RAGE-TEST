@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔥 Rage Test 🔥</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    height:100vh;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#ff4b4b,#ff9966);
+    transition:transform 0.1s;
+}
+
+.container{
+    text-align:center;
+    color:white;
+}
+
+h1{
+    font-size:3rem;
+    margin-bottom:30px;
+}
+
+button{
+    padding:15px 35px;
+    font-size:1.2rem;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    margin:10px;
+    font-weight:bold;
+}
+
+#yesBtn{
+    background:#2ecc71;
+    color:white;
+}
+
+#noBtn{
+    background:#e74c3c;
+    color:white;
+    position:absolute;
+}
+
+#result{
+    margin-top:20px;
+    font-size:1.5rem;
+}
+
+#rageScore{
+    margin-top:20px;
+    font-size:1.3rem;
+}
+
+.bar{
+    width:300px;
+    height:25px;
+    background:white;
+    margin:15px auto;
+    border-radius:30px;
+    overflow:hidden;
+}
+
+.fill{
+    height:100%;
+    width:0%;
+    background:limegreen;
+    transition:0.3s;
+}
+
+.finalMessage{
+    margin-top:15px;
+    font-size:2rem;
+    color:yellow;
+    font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1 id="question">😡 Are You Angry?</h1>
+
+    <button id="yesBtn">Yes</button>
+    <button id="noBtn">No</button>
+
+    <div id="result"></div>
+
+    <div id="rageScore">
+        Rage Score: <span id="score">0</span>
+    </div>
+
+    <div class="bar">
+        <div class="fill" id="fill"></div>
+    </div>
+
+    <div id="rageLevel">
+        Rage Level: 0%
+    </div>
+
+    <div id="finalMessage" class="finalMessage"></div>
+
+</div>
+
+<script>
+
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const question = document.getElementById("question");
+const result = document.getElementById("result");
+const scoreText = document.getElementById("score");
+const fill = document.getElementById("fill");
+const rageLevel = document.getElementById("rageLevel");
+const finalMessage = document.getElementById("finalMessage");
+
+let gameStarted = false;
+let rageScore = 0;
+
+noBtn.style.left = "55%";
+noBtn.style.top = "55%";
+
+function playBeep(freq){
+
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.frequency.value = freq;
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        ctx.currentTime + 0.15
+    );
+
+    osc.stop(ctx.currentTime + 0.15);
+}
+
+function shakeScreen(){
+
+    document.body.style.transform =
+        `translate(${Math.random()*10-5}px,
+                   ${Math.random()*10-5}px)`;
+
+    setTimeout(()=>{
+        document.body.style.transform="translate(0,0)";
+    },100);
+}
+
+function updateRage(){
+
+    rageScore++;
+
+    scoreText.innerText = rageScore;
+
+    let percent = Math.min(rageScore*10,100);
+
+    fill.style.width = percent + "%";
+
+    rageLevel.innerText =
+        "Rage Level: " + percent + "%";
+
+    if(percent < 40){
+        fill.style.background="limegreen";
+    }
+    else if(percent < 70){
+        fill.style.background="orange";
+    }
+    else{
+        fill.style.background="red";
+    }
+
+    if(percent >= 100){
+        finalMessage.innerHTML =
+            "😈 RAGE LEVEL OVER 9000! 😈";
+    }
+}
+
+function moveButton(){
+
+    const maxX =
+        window.innerWidth-noBtn.offsetWidth;
+
+    const maxY =
+        window.innerHeight-noBtn.offsetHeight;
+
+    const randomX = Math.random()*maxX;
+    const randomY = Math.random()*maxY;
+
+    noBtn.style.left = randomX+"px";
+    noBtn.style.top = randomY+"px";
+
+    updateRage();
+
+    shakeScreen();
+
+    playBeep(600 + rageScore*20);
+}
+
+noBtn.addEventListener("mouseover",moveButton);
+noBtn.addEventListener("touchstart",moveButton);
+
+yesBtn.addEventListener("click",()=>{
+
+    if(!gameStarted){
+
+        question.innerHTML =
+            "😏 I know you are angry. If not, prove it!";
+
+        result.innerHTML =
+            "😂 I knew it!";
+
+        yesBtn.innerHTML =
+            "Still Angry?";
+
+        playBeep(300);
+
+        gameStarted = true;
+    }
+
+    else{
+
+        question.innerHTML =
+            "😡 Are You Angry?";
+
+        result.innerHTML = "";
+
+        yesBtn.innerHTML = "Yes";
+
+        rageScore = 0;
+
+        scoreText.innerText = "0";
+
+        fill.style.width = "0%";
+
+        fill.style.background = "limegreen";
+
+        rageLevel.innerHTML =
+            "Rage Level: 0%";
+
+        finalMessage.innerHTML = "";
+
+        noBtn.style.left = "55%";
+        noBtn.style.top = "55%";
+
+        gameStarted = false;
+    }
+});
+
+</script>
+
+</body>
+</html>
